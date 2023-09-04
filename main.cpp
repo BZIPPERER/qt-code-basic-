@@ -1,25 +1,34 @@
 #include "mainwindow.h"
 #include <QWidget>
 #include <QLabel>
+#include <QIcon>
 #include <QPushButton>
 #include <QVBoxLayout>
 #include <QApplication>
 #include <QLineEdit>
-#include <vector>
+#include <vector>       // Not needed
 #include <QGroupBox>
-#include <QRadioButton> //7 radhaus
+#include <QRadioButton> //Needed
 #include <QString>
 #include <QObject>
 // XML AREA
 #include <QDomNode>
 #include <QDebug>
 #include <QtXml>
-#include <QTranslator>
+#include <QTranslator> // Not needed
+
+
 static void insert()
 {
-    qDebug() << "pressed from static function";
-    MainWindow hex = new MainWindow(); // HelperUtil (Java);
+    qDebug() << "pressed left button from static context";
+    MainWindow hex = new MainWindow(); // a.k.a HelperUtil (Java);
     hex.on_pushButton_clicked();
+}
+static void progress()
+{
+    qDebug() << "pressed right button from static context";
+    MainWindow hex = new MainWindow();
+    hex.on_rightBtn_clicked();
 }
 int main(int argc, char *argv[])
 {
@@ -31,21 +40,32 @@ int main(int argc, char *argv[])
      * (object on the stack).
     */
 
+       // Translator approach
+
+    QTranslator qtTranslator;
+    if (qtTranslator.load(QLocale::system(),
+                          "qt", "_",
+                          QLibraryInfo::location(QLibraryInfo::TranslationsPath)))
+    {
+        qDebug() << "qtTranslator ok";
+        a.installTranslator(&qtTranslator);
+    }
+
 
     QPushButton *mary ; // NoAction Cast Away
-    QLabel      *jesus ;
+    QLabel      *pointer ;
     // Create a document to write XML
     QDomDocument document;
 
     // Making the root element
-    QDomElement root = document.createElement("Gezemaneh");
+    QDomElement root = document.createElement("Outer Element");
 
     // Adding the root element to the docuemnt
     document.appendChild(root);
     // Making the root element
-    QDomElement router = document.createElement("Kafernaum");
-    // Trade for Glory
-    QDomElement router2 = document.createElement("Magic Bruce");
+    QDomElement router = document.createElement("Inner Element");
+
+    QDomElement router2 = document.createElement("Magic Element");
     root.appendChild(router);
 
 
@@ -69,11 +89,11 @@ int main(int argc, char *argv[])
 
         domo.appendChild(router2);
         QDomDocument ddd = domo.toDocument();
-        jesus = new QLabel("Terminator 2 is a good movie I think");
-        jesus->setStyleSheet("background-color:yellow;font-size:22px");
+        pointer = new QLabel("Terminator 2 is a good movie I think");
+        pointer->setStyleSheet("background-color:yellow;font-size:22px");
 
         file.close();
-        qDebug() << "Schreibarbeit abgeschlossen";
+        qDebug() << "Closing write process";
     }
     QGroupBox *groupBox = new QGroupBox ("Item Selection");
     QGroupBox *groupBox2 = new QGroupBox("Inclusive Radio Buttons");
@@ -134,7 +154,7 @@ int main(int argc, char *argv[])
     window->setWindowTitle("Qt nice Demo");
 
 
-    //components
+    // Top Left Button (No function yet)
     QPushButton *sly = new QPushButton(); //
     sly->resize(200,45);
     sly->setText("Chose Item");
@@ -148,27 +168,36 @@ int main(int argc, char *argv[])
     //sly->setStyleSheet('{background-color:lightgreen;color:black;}');
 
     sly->move(30,30);
-    //sly->addAction(on_actionShow_something_new());
-    //sly->clicked(on_actionShow_something_new);
     layoutNew->addWidget(sly);
     layoutNew->addWidget(groupBox);
     QHBoxLayout *quer = new QHBoxLayout();
-    QPushButton *leftBtn  = new QPushButton("<<");
-    //https://www.youtube.com/watch?v=RX5KMgoaVy8               MAC DONALDS WERBUNG
-
-
-    // Ladung nicht verlieren
-    //leftBtn->connect(leftBtn, &QPushButton::clicked, this, &MainWindow::on_pushButton_clicked);
+    QPushButton *leftBtn  = new QPushButton("");
     QObject::connect(leftBtn, &QPushButton::pressed,[](){qDebug("They pressed me!");});
     QObject::connect(leftBtn, &QPushButton::pressed,insert);
     leftBtn->setStyleSheet("background-color:lightgreen;color:black;font-size:33px");
-    QPushButton *rightBtn = new QPushButton(">>");
+    /*like this
+     * QPixmap pixmap("image_path");
+        QIcon ButtonIcon(pixmap);
+        button->setIcon(ButtonIcon);
+        button->setIconSize(pixmap.rect().size());*/
+    //    leftBtn->setIcon('info.png');
+    QPixmap pixelMap ("C:\\Users\\tette\\Desktop\\QTBasic\\A400M\\info.png");
+    QIcon ButtonIcon(pixelMap);
+    leftBtn->setIcon(QIcon("C:\\Users\\tette\\Desktop\\QTBasic\\A400M\\info.png"));
+    leftBtn->setIconSize(pixelMap.rect().size());
+
+    QPushButton *rightBtn = new QPushButton("");
+    QObject::connect(rightBtn, &QPushButton::pressed,progress);
+
     rightBtn->setStyleSheet("background-color:lightgreen;color:black;font-size:33px");
+    rightBtn->setIcon(QIcon("C:\\Users\\tette\\Desktop\\QTBasic\\A400M\\question.png"));
+    rightBtn->setIconSize(pixelMap.rect().size());
+
     quer->addWidget(leftBtn);
     quer->addWidget(rightBtn);
     layoutOld->addLayout(quer);
     layoutOld->addWidget(mary);
-    layoutOld->addWidget(jesus);
+    layoutOld->addWidget(pointer);
     layoutOld->addWidget(groupBox2);
 
     layoutHorrer->addLayout(layoutNew); // Transformation
